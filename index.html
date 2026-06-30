@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARUSH GORE | Portfolio (Right Panel)</title>
+    <style>
+        :root { --bg-color: #f7fcf9; --text-color: #2c3e35; --accent-color: #f4e1e8; --modal-bg: #ffffff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        header { padding: 2rem; text-align: center; background-color: var(--accent-color); border-bottom: 2px solid #fff; }
+        h1 { font-weight: 300; letter-spacing: 2px; font-size: 2.5rem; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .subtitle { font-style: italic; color: #556b60; }
+        nav { margin-top: 2rem; }
+        nav a { color: var(--text-color); text-decoration: none; margin: 0 1rem; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; border-bottom: 1px solid transparent; transition: border-color 0.3s ease; }
+        nav a.active, nav a:hover { border-bottom: 1px solid var(--text-color); }
+        .gallery { column-count: 3; column-gap: 1rem; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .gallery-item { break-inside: avoid; margin-bottom: 1rem; border-radius: 8px; overflow: hidden; position: relative; background-color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.03); transition: transform 0.3s ease; cursor: pointer; }
+        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-item img { width: 100%; display: block; border-radius: 8px; }
+        .overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.4), transparent); color: white; padding: 1rem; opacity: 0; transition: opacity 0.3s ease; }
+        .gallery-item:hover .overlay { opacity: 1; }
+        footer { text-align: center; padding: 2rem; margin-top: 4rem; font-size: 0.9rem; color: #798f84; }
+        @media (max-width: 900px) { .gallery { column-count: 2; } }
+        @media (max-width: 600px) { .gallery { column-count: 1; } }
+
+        /* Modal Styles - Right Panel */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: 1000; align-items: center; justify-content: center; padding: 2rem; }
+        .modal-content { display: inline-flex; flex-direction: row; background: var(--modal-bg); max-width: 95vw; max-height: 95vh; border-radius: 8px; overflow: hidden; position: relative; box-shadow: 0 15px 50px rgba(0,0,0,0.3); }
+        .modal-image-container { display: flex; }
+        .modal-image-container img { max-width: 51vw; max-height: 69vh; display: block; }
+        .modal-desc { width: 350px; padding: 3rem; overflow-y: auto; color: var(--text-color); border-left: 1px solid #ddd; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; cursor: pointer; color: var(--text-color); line-height: 1; z-index: 10; }
+        @media (max-width: 768px) { .modal-content { flex-direction: column; } .modal-image-container img { max-width: 90vw; max-height: 50vh; } .modal-desc { width: auto; height: auto; padding: 1.5rem; } }
+
+        /* Modal Nav Buttons */
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #333;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1010;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.9); }
+        .prev-btn { left: 20px; }
+        .next-btn { right: 20px; }
+        .nav-btn:active { transform: translateY(-50%) scale(0.95); }
+        @media (max-width: 768px) {
+            .nav-btn { width: 40px; height: 40px; font-size: 18px; }
+            .prev-btn { left: 10px; }
+            .next-btn { right: 10px; }
+        }
+
+        /* Color Picker */
+        .color-picker-panel { position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; border: 1px solid #ddd; }
+        .color-picker-panel h4 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #333; }
+        .picker-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .picker-row input[type="color"] { margin-right: 10px; cursor: pointer; border: none; width: 25px; height: 25px; padding: 0; }
+        .picker-row label { font-size: 12px; color: #555; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ARUSH GORE</h1>
+        <p class="subtitle">Capturing quiet moments.</p>
+        <nav>
+            <a href="index.html" class="active">Portfolio</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main class="gallery" id="galleryContainer"></main>
+
+    <footer><p>&copy; 2026 Arush Gore Photography.</p></footer>
+
+    <!-- Modal -->
+    <div id="photoModal" class="modal" onclick="if(event.target === this) closeModal()">
+        <button class="nav-btn prev-btn" onclick="navigate(-1); event.stopPropagation();">&#10094;</button>
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-image-container">
+                <img id="modalImg" src="" alt="Expanded Image">
+            </div>
+            <div class="modal-desc">
+                <h3 id="modalTitle">Title</h3>
+                <p id="modalText">Description</p>
+                <br>
+                <p style="font-size: 0.9em; color: #777;"><em>Equipment: Sony A7IV, 35mm f/1.4</em></p>
+            </div>
+        </div>
+        <button class="nav-btn next-btn" onclick="navigate(1); event.stopPropagation();">&#10095;</button>
+    </div>
+
+    <!-- Color Picker Panel -->
+    <div class="color-picker-panel" id="pickerPanel">
+        <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;" onclick="togglePicker()">
+            <h4 style="margin: 0;">Theme Colors</h4>
+            <span id="pickerToggleBtn" style="font-weight: bold; margin-left: 15px; font-size: 12px; color: #555;">[-]</span>
+        </div>
+        <div id="pickerContent" style="margin-top: 10px;">
+            <div class="picker-row">
+                <input type="color" id="headerColor" value="#f4e1e8">
+                <label for="headerColor">Header Color</label>
+            </div>
+            <div class="picker-row">
+                <input type="color" id="pageColor" value="#f7fcf9">
+                <label for="pageColor">Page Color</label>
+            </div>
+            <div class="picker-row">
+                <input type="color" id="modalColor" value="#ffffff">
+                <label for="modalColor">Modal Color</label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const photosList = [
+            {
+                src: 'instagram-photos/instagram/arushgore_/3898018894287841375.jpg',
+                title: 'Work #1',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3896685348239583551.jpg',
+                title: 'Work #2',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3896631923300749843.jpg',
+                title: 'Work #3',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3896629710704662375.jpg',
+                title: 'Work #4',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3896623822564603013.jpg',
+                title: 'Work #5',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3843760138029776413.jpg',
+                title: 'Work #6',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3843754548230526059.jpg',
+                title: 'Work #7',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3837903440278902425.jpg',
+                title: 'Work #8',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3837901830127505034.jpg',
+                title: 'Work #9',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3837290952407525603.jpg',
+                title: 'Work #10',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3833843086427093898_3833842980688688024.jpg',
+                title: 'Work #11',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3833843086427093898_3833842974590140077.jpg',
+                title: 'Work #12',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3726647101884639414.jpg',
+                title: 'Work #13',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3726644158682779741.jpg',
+                title: 'Work #14',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3726638451157791553_3726638445034136718.jpg',
+                title: 'Work #15',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3726638451157791553_3726638445134741571.jpg',
+                title: 'Work #16',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3459745276183994260.jpg',
+                title: 'Work #17',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3459740220638450027.jpg',
+                title: 'Work #18',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3459735095450753326.jpg',
+                title: 'Work #19',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3459734556507793693.jpg',
+                title: 'Work #20',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3459733453120485467.jpg',
+                title: 'Work #21',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3407792547882169781.jpg',
+                title: 'Work #22',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3407792182793182061.jpg',
+                title: 'Work #23',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3407791558580221353.jpg',
+                title: 'Work #24',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3407791140986746020.jpg',
+                title: 'Work #25',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3407789691678609127.jpg',
+                title: 'Work #26',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3407780082109198314.jpg',
+                title: 'Work #27',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3364711468569127355.jpg',
+                title: 'Work #28',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3364707544965377442.jpg',
+                title: 'Work #29',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3267765591225512775.jpg',
+                title: 'Work #30',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3191105220104832377.jpg',
+                title: 'Work #31',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3158502289647598753.jpg',
+                title: 'Work #32',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3158164005792922296.jpg',
+                title: 'Work #33',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3157612585075153734.jpg',
+                title: 'Work #34',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3154521575168816441.jpg',
+                title: 'Work #35',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3150078589844563573_3150078583544692826.jpg',
+                title: 'Work #36',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3150078589844563573_3150078583544664613.jpg',
+                title: 'Work #37',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3150078589844563573_3150078583720725723.jpg',
+                title: 'Work #38',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3150075553017421037.jpg',
+                title: 'Work #39',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3150074702034945938.jpg',
+                title: 'Work #40',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3150071438019335165.jpg',
+                title: 'Work #41',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3142429635283665610.jpg',
+                title: 'Work #42',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3100957706244867005.jpg',
+                title: 'Work #43',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3090241794542008139.jpg',
+                title: 'Work #44',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3084416543786692044.jpg',
+                title: 'Work #45',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3072923734046969582.jpg',
+                title: 'Work #46',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3069655471670352573_3069655468105091139.jpg',
+                title: 'Work #47',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3069655471670352573_3069655468113555001.jpg',
+                title: 'Work #48',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3065574181027246411.jpg',
+                title: 'Work #49',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3047554186980743131.jpg',
+                title: 'Work #50',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932253344885.jpg',
+                title: 'Work #51',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932504981021.jpg',
+                title: 'Work #52',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932505092145.jpg',
+                title: 'Work #53',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932463162628.jpg',
+                title: 'Work #54',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932504959185.jpg',
+                title: 'Work #55',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932261713499.jpg',
+                title: 'Work #56',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932261700326.jpg',
+                title: 'Work #57',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3046810937915832219_3046810932270272798.jpg',
+                title: 'Work #58',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3038177760754133098.jpg',
+                title: 'Work #59',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3022023820669036519_3022023815535065095.jpg',
+                title: 'Work #60',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3022023820669036519_3022023815535102068.jpg',
+                title: 'Work #61',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3022023820669036519_3022023815702956412.jpg',
+                title: 'Work #62',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3022023820669036519_3022023815535179834.jpg',
+                title: 'Work #63',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3022023820669036519_3022023815535022674.jpg',
+                title: 'Work #64',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3022022965752347261.jpg',
+                title: 'Work #65',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3021233784276952390.jpg',
+                title: 'Work #66',
+                desc: 'A captured moment from Instagram.'
+            },
+            {
+                src: 'instagram-photos/instagram/arushgore_/3021166183068978444.jpg',
+                title: 'Work #67',
+                desc: 'A captured moment from Instagram.'
+            }
+        ];
+
+        let currentIndex = 0;
+
+        function openModal(src, title, desc) {
+            currentIndex = photosList.findIndex(p => p.src === src);
+            if (currentIndex === -1) currentIndex = 0;
+            updateModalContent();
+            document.getElementById('photoModal').style.display = 'flex';
+        }
+
+        function updateModalContent() {
+            const photo = photosList[currentIndex];
+            document.getElementById('modalImg').src = photo.src;
+            document.getElementById('modalTitle').textContent = photo.title;
+            document.getElementById('modalText').textContent = photo.desc;
+
+            // Hide/show navigation buttons based on current index
+            const prevBtn = document.querySelector('.prev-btn');
+            const nextBtn = document.querySelector('.next-btn');
+            
+            if (currentIndex === 0) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'flex';
+            }
+
+            if (currentIndex === photosList.length - 1) {
+                nextBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'flex';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('photoModal').style.display = 'none';
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('galleryContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            photosList.forEach((photo, index) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                item.onclick = () => openModal(photo.src, photo.title, photo.desc);
+                
+                const img = document.createElement('img');
+                img.src = photo.src;
+                img.alt = photo.title;
+                
+                const overlay = document.createElement('div');
+                overlay.className = 'overlay';
+                overlay.textContent = photo.title;
+                
+                item.appendChild(img);
+                item.appendChild(overlay);
+                container.appendChild(item);
+            });
+        }
+        window.addEventListener('DOMContentLoaded', renderGallery);
+
+        function navigate(direction) {
+            const newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < photosList.length) {
+                currentIndex = newIndex;
+                updateModalContent();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('photoModal');
+            if (modal.style.display === 'flex') {
+                if (e.key === 'ArrowRight') {
+                    navigate(1);
+                } else if (e.key === 'ArrowLeft') {
+                    navigate(-1);
+                } else if (e.key === 'Escape') {
+                    closeModal();
+                }
+            }
+        });
+
+        document.getElementById('headerColor').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--accent-color', e.target.value);
+        });
+        document.getElementById('pageColor').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--bg-color', e.target.value);
+        });
+        document.getElementById('modalColor').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--modal-bg', e.target.value);
+        });
+
+        function togglePicker() {
+            const content = document.getElementById('pickerContent');
+            const btn = document.getElementById('pickerToggleBtn');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.textContent = '[-]';
+            } else {
+                content.style.display = 'none';
+                btn.textContent = '[+]';
+            }
+        }
+    </script>
+</body>
+</html>

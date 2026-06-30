@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARUSH GORE | About</title>
+    <style>
+        :root { --bg-color: #f7fcf9; --text-color: #2c3e35; --accent-color: #f4e1e8; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        header { padding: 2rem; text-align: center; background-color: var(--accent-color); border-bottom: 2px solid #fff; }
+        h1 { font-weight: 300; letter-spacing: 2px; font-size: 2.5rem; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .subtitle { font-style: italic; color: #556b60; }
+        nav { margin-top: 2rem; }
+        nav a { color: var(--text-color); text-decoration: none; margin: 0 1rem; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; border-bottom: 1px solid transparent; transition: border-color 0.3s ease; }
+        nav a.active, nav a:hover { border-bottom: 1px solid var(--text-color); }
+        
+        .about-container { max-width: 900px; margin: 4rem auto; padding: 0 2rem; display: flex; align-items: center; gap: 4rem; }
+        .about-image { flex: 1; }
+        .about-image img { width: 100%; border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .about-text { flex: 1; }
+        .about-text h2 { margin-bottom: 1rem; font-size: 2rem; font-weight: 300; }
+        .about-text p { margin-bottom: 1.5rem; color: #4a5c53; }
+        footer { text-align: center; padding: 2rem; margin-top: 4rem; font-size: 0.9rem; color: #798f84; }
+        @media (max-width: 768px) { .about-container { flex-direction: column; text-align: center; } }
+
+        /* Color Picker */
+        .color-picker-panel { position: fixed; bottom: 20px; right: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999; border: 1px solid #ddd; }
+        .color-picker-panel h4 { margin: 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #333; }
+        .picker-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .picker-row input[type="color"] { margin-right: 10px; cursor: pointer; border: none; width: 25px; height: 25px; padding: 0; }
+        .picker-row label { font-size: 12px; color: #555; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ARUSH GORE</h1>
+        <p class="subtitle">Capturing quiet moments.</p>
+        <nav>
+            <a href="index.html">Portfolio</a>
+            <a href="about.html" class="active">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main class="about-container">
+        <div class="about-image">
+            <img src="about-me.png" alt="Arush Gore">
+        </div>
+        <div class="about-text">
+            <h2>Hello, I'm Arush.</h2>
+            <p>I am a photographer specializing in natural light, intimate portraits, and wild landscapes.</p>
+            <p>My approach is deeply rooted in storytelling. I believe every photograph should evoke an emotion and preserve a fleeting moment in time.</p>
+        </div>
+    </main>
+
+    <footer><p>&copy; 2026 Arush Gore Photography.</p></footer>
+
+    <!-- Color Picker Panel -->
+    <div class="color-picker-panel" id="pickerPanel">
+        <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;" onclick="togglePicker()">
+            <h4 style="margin: 0;">Theme Colors</h4>
+            <span id="pickerToggleBtn" style="font-weight: bold; margin-left: 15px; font-size: 12px; color: #555;">[-]</span>
+        </div>
+        <div id="pickerContent" style="margin-top: 10px;">
+            <div class="picker-row">
+                <input type="color" id="headerColor" value="#f4e1e8">
+                <label for="headerColor">Header Color</label>
+            </div>
+            <div class="picker-row">
+                <input type="color" id="pageColor" value="#f7fcf9">
+                <label for="pageColor">Page Color</label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('headerColor').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--accent-color', e.target.value);
+        });
+        document.getElementById('pageColor').addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--bg-color', e.target.value);
+        });
+
+        function togglePicker() {
+            const content = document.getElementById('pickerContent');
+            const btn = document.getElementById('pickerToggleBtn');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.textContent = '[-]';
+            } else {
+                content.style.display = 'none';
+                btn.textContent = '[+]';
+            }
+        }
+    </script>
+</body>
+</html>
